@@ -12,6 +12,7 @@ struct Word *parse(int *length)
    //Process
    // Create first word
    // Assign Head
+   // LOOP
    // create next word
    // assign last_ptr's next value to new word
    // repeat
