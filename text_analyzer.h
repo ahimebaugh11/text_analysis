@@ -16,7 +16,7 @@ void print(struct Word head){
     while(count<10){
         printf("%s", word.txt);
         count++;
-        word = *head.next;
+        word = *(head.next);
     }
 };
 

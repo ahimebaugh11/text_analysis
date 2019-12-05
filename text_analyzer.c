@@ -4,15 +4,18 @@
 #include "text_analyzer.h"
 
 
-//Process
-// Create first word
-// Assign Head
-// create next word
-// assign last_ptr's next value to new word
-// repeat
 
-struct Word* parse()
+
+struct Word *parse(int *length)
 {
+
+   //Process
+   // Create first word
+   // Assign Head
+   // create next word
+   // assign last_ptr's next value to new word
+   // repeat
+
    // initiates stuff for reading in text file
    char buf[50];
    FILE *f;
@@ -26,6 +29,7 @@ struct Word* parse()
 
    while (1)
    {
+      length++;
       //printf("%s", "HEAD:\n");
       //printf("%s", (*head).txt);
       //printf("%s", "\n");
@@ -70,20 +74,36 @@ struct Word* parse()
    return head;
 }
 
-void analyze()
+
+void trim(struct Word *head, int *length)
 {
+   // remove common words like "the", "a", "and", "or"
 
+   // Remove non-alphanumeric characters
+}
 
+void word_analyze(struct Word *head, int *length)
+{
+// find shortest
 
+// find longest
 
-
-
-
+// Count number of occurences of each unique word
 
 }
 
+void phrase_analyze(struct Word *head, int *length)
+{
+// find most common pair of words
+
+}
 
 int main(int argc, char* argv[]){
-   struct Word* head = parse();
-   analyze(head);
+   int length = 0;
+
+   struct Word *head = parse(&length);
+   print(*head);
+   trim(head, &length);
+   word_analyze(head, &length);
+   phrase_analyze(head, &length);
 }
