@@ -7,18 +7,11 @@
 
 typedef struct Word { 
     char txt[50]; 
-    struct Word *next; 
+    struct Word *after; 
+    struct Word *before;
 } Word;
 
-void print(struct Word head){
-    int count = 0;
-    struct Word word = head;
-    while(count<10){
-        printf("%s", word.txt);
-        count++;
-        word = *(head.next);
-    }
-};
+
 
 
 #endif
