@@ -141,11 +141,50 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
     // Remove non-alphanumeric characters
 }
 
-void word_analyze(Word *head, int *length)
+void word_analyze(Word* head, int* length)
 {
     // find shortest
 
     // find longest
+    int count = 0;
+    struct Word* current = head;
+    int len = 0;
+    int min = 50;
+    char min_word[50];
+    int max = 0;
+    char max_word[50];
+    while(count<*length){
+        len = strlen((*current).txt);
+        if(len < min){
+            min = len;
+            strcpy(min_word, (*current).txt);
+        }    
+        if(len > max){
+            max = len;
+            strcpy(max_word, (*current).txt);
+        }            
+        
+        
+        
+        
+        current = (*current).after;
+        count++;
+        
+        
+    }
+    printf("%s", "Max: ");
+    printf("%s", max_word);
+    printf("%s", " with a length of ");
+    printf("%d", max);
+    printf("%s", " letters");
+    printf("%s", "\n");
+    printf("%s", "Min: ");
+    printf("%s", min_word);
+    printf("%s", " with a length of ");
+    printf("%d", min);
+    printf("%s", " letters");
+    printf("%s", "\n");
+
 
     // Count number of occurences of each unique word
 
@@ -167,16 +206,9 @@ int main(int argc, char* argv[]){
     int* ptr2 = &rem_length;
     char path2[50] = "stop-word-list.txt";
     Word* rem_head = parse(ptr2, path2);
-    printf("%s", "Length: ");
-    printf("%i", length);
-    printf("%s", "\n");
-    printf("%s", "Rem Length: ");
-    printf("%i", rem_length);
-    printf("%s", "\n");
-
-
+ 
     trim(head, rem_head, ptr, ptr2);
-    print(head, ptr);
+    //print(head, ptr);
     
     word_analyze(head, ptr);
 
