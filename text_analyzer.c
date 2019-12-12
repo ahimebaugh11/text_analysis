@@ -21,97 +21,75 @@ Word* createWord(){
     return new;
 }
 
-void print(struct Word* head){
+Word* deleteWord(Word* delete){
+    (*((*delete).before)).after = (*delete).after;
+    (*((*delete).after)).before = (*delete).before;
+    Word* new_current = (*delete).after;
+    
+    return new_current;
+}
+
+void print(struct Word* head, int* length){
     int count = 0;
     struct Word word = *head;
-    while(count<10){
+    while(count<*length){
         printf("%s", word.txt);
         printf("%s", "\n");
         count++;
         word = *(word.after);
+       
     }
 };
 
-Word* parse(int *length)
+Word* parse(int* length, char path[50])
 {
-
-    //Process
-    // Create first word
-    // Assign Head
-    // create next word
-    // assign last_ptr's next value to new word
-    // repeat
 
     // initiates stuff for reading in text file
     char buf[50];
     FILE *f;
-    f=fopen("test_text.txt","r");
+    f=fopen(path,"r");
 
 
     // initiates pointers
-
-    
-
     Word* head = NULL;
     Word* last = NULL;
     Word* current = NULL;
 
     while (1)
     {
-        length++;
-
+        
+        
         //if end of file, set pointer to head
         if(feof(f)){
             (*last).after = head;
+            (*head).before = last;
             break;
         }
 
+
+        *length = *length + 1;
+        
         //next word
         fscanf(f,"%s",buf);
-        
-
-
-
-
-        //printf("%s", "\n");
-        //printf("%s", "head pointer: ");
-        //printf("%s", (*head).txt);
-        //printf("%s", "\n");
-        //printf("%s", "last pointer: ");
-        //printf("%s", (*last).txt);
-        //printf("%s", "\n");
-        
-
-
-
 
         // IF first word, create new word and set as last word and head, iterate
         if(last == NULL){
             
             head = createWord();
+            
+            strcpy((*head).txt, buf);
             last = head;
             current = head;
-            strcpy((*head).txt, buf);
 
-            
-            //printf("%s", (*head).txt);
-            //printf("%s", "\n");
         }
 
         // else, create new word, copy string, set last.next to current pointer, 
         // set new last pointer, iterate
         else{
             Word* newWord = createWord();
+            strcpy((*newWord).txt, buf);
+
             current = newWord;
-            strcpy((*current).txt, buf);
-
-            //printf("%s", (*newWord).txt);
-            //printf("%s", "\n");
-            //printf("%s", "current pointer: ");
-            //printf("%s", (*current).txt);
-            //printf("%s", "\n");
-
-
             last->after = current;
             current->before = last;
             last = current;
@@ -124,9 +102,41 @@ Word* parse(int *length)
 }
 
 
-void trim(Word *head, int *length)
+void trim(Word* head, Word* rem_head, int* length, int* rem_length)
 {
     // remove common words like "the", "a", "and", "or"
+    int count = 0;
+    int inner_count = 0;
+    struct Word* current = head;
+    struct Word* rem_current = rem_head;
+    
+    while(count<*length){
+        int indicator = 0;
+        inner_count = 0;
+        while(inner_count<*rem_length){
+            
+            if(strcmp((*current).txt, (*rem_current).txt) == 0)
+                {
+
+                *length = *length - 1;
+                current = deleteWord(current);
+                rem_current = (*rem_current).after;
+                indicator = 1;
+                continue;
+            }
+            else{
+                rem_current = (*rem_current).after;
+            }
+            inner_count++;
+        }
+
+        if(indicator == 0){
+            current = (*current).after;
+        }
+        count++;
+        
+        
+    }
 
     // Remove non-alphanumeric characters
 }
@@ -149,11 +159,26 @@ void phrase_analyze(Word *head, int *length)
 
 int main(int argc, char* argv[]){
     int length = 0;
+    int* ptr = &length;
+    char path1[50] = "test_text.txt";
+    Word* head = parse(ptr, path1);
+
+    int rem_length = 0;
+    int* ptr2 = &rem_length;
+    char path2[50] = "stop-word-list.txt";
+    Word* rem_head = parse(ptr2, path2);
+    printf("%s", "Length: ");
+    printf("%i", length);
+    printf("%s", "\n");
+    printf("%s", "Rem Length: ");
+    printf("%i", rem_length);
+    printf("%s", "\n");
+
+
+    trim(head, rem_head, ptr, ptr2);
+    print(head, ptr);
     
-    Word* head = parse(&length);
-    print(head);
-    /*
-    trim(&head, &length);
-    word_analyze(&head, &length);
-    phrase_analyze(&head, &length);*/
+    word_analyze(head, ptr);
+
+    //phrase_analyze(&head, &length);
 }
