@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "text_analyzer.h"
 
 
@@ -13,6 +14,10 @@ gcc text_analyzer.h
 ./analyzer.exe
 
 */
+
+
+
+
 Word* createWord(){
     Word* new; 
     new = (struct Word*)malloc(sizeof(struct Word));
@@ -20,6 +25,8 @@ Word* createWord(){
     new->before = NULL;
     return new;
 }
+
+
 
 Word* deleteWord(Word* delete){
     (*((*delete).before)).after = (*delete).after;
@@ -34,12 +41,15 @@ void print(struct Word* head, int* length){
     struct Word word = *head;
     while(count<*length){
         printf("%s", word.txt);
+        printf("%s", "||||||||||||");
         printf("%s", "\n");
         count++;
         word = *(word.after);
        
     }
 };
+
+
 
 Word* parse(int* length, char path[50])
 {
@@ -71,6 +81,7 @@ Word* parse(int* length, char path[50])
         
         //next word
         fscanf(f,"%s",buf);
+        
 
         // IF first word, create new word and set as last word and head, iterate
         if(last == NULL){
@@ -109,15 +120,36 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
     int inner_count = 0;
     struct Word* current = head;
     struct Word* rem_current = rem_head;
-    
+
+
+
+
+
     while(count<*length){
         int indicator = 0;
         inner_count = 0;
+        // to lower case
+        /*for(int i = 0; (*current).txt[i]; i++){
+            (*current).txt[i] = tolower((*current).txt[i]);
+        }*/
+
+    
+        for (int i = 0, len = strlen((*current).txt); i < len; i++) 
+        { 
+            if( isspace(((*current).txt)[i]) == 0 && ispunct(((*current).txt)[i]) == 0 ){
+                (*current).txt[i++] = tolower(((*current).txt)[i]);
+            }
+        }
+
         while(inner_count<*rem_length){
             
+            
+
             if(strcmp((*current).txt, (*rem_current).txt) == 0)
                 {
-
+                //printf("%s", "TRIM: ");
+                //printf("%s", (*current).txt);
+                //printf("%s", "\n");
                 *length = *length - 1;
                 current = deleteWord(current);
                 rem_current = (*rem_current).after;
@@ -132,8 +164,10 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
 
         if(indicator == 0){
             current = (*current).after;
+            count++;
         }
-        count++;
+        
+        
         
         
     }
@@ -208,7 +242,7 @@ int main(int argc, char* argv[]){
     Word* rem_head = parse(ptr2, path2);
  
     trim(head, rem_head, ptr, ptr2);
-    //print(head, ptr);
+    print(head, ptr);
     
     word_analyze(head, ptr);
 
