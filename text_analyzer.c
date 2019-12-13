@@ -105,86 +105,97 @@ Word* parse(int* length, char path[50])
             current->before = last;
             last = current;
         }
-        //printf("%s", buf);
-        //printf("%s", "\n");
+        current->occurences = 0;
+        
     }
     fclose(f);
     return head;
 }
 
-Word* unique_parse(int* length, char path[50])
+
+
+Word* unique_parse(int* uni_length, int* full_length,  struct Word* head)
 {
 
-    // initiates stuff for reading in text file
-    char buf[50];
-    FILE *f;
-    f=fopen(path,"r");
-
-
     // initiates pointers
-    Word* head = NULL;
-    Word* last = NULL;
-    Word* current = NULL;
-    Word* loop_current = NULL;
+    Word* full_head = head;
+    Word* full_current = NULL;
+    Word* uni_head = head;
+    Word* uni_current = NULL;
+    Word* uni_last = head;
+    Word temp;
+    
+    
+    full_current = full_head;
 
-    while (1)
-    {
+    int full_count = 0;
+    int count = 0;
+    
+    // counts occurences
+    while (full_count < *full_length)
+    {   
         
-        
-        //if end of file, set pointer to head
-        if(feof(f)){
-            (*last).after = head;
-            (*head).before = last;
-            break;
-        }
-
-
-        *length = *length + 1;
-        
-        //next word
-        fscanf(f,"%s",buf);
-        
-
-        // IF first word, create new word and set as last word and head, iterate
-        if(last == NULL){
+        temp = *full_head;
+        count = 0;
+        while (count < *full_length)
+        {  
             
-            head = createWord();
-            
-            strcpy((*head).txt, buf);
-            last = head;
-            current = head;
 
-        }
-        int indicator = 0;
-        int count = 0;
-        loop_current = head;
-
-        //checks if unique, if found to be equal to any of the current in the unique array, set ind to 1
-        while(count < *length){
-            indicator = strcmp(buf, (*loop_current).txt);
-            if(strcmp(buf, (*loop_current).txt)  == 1 ){
-                break;
+            if( strcmp((temp).txt, (*full_current).txt) == 0){
+                
+                (*full_current).occurences += 1;
             }
-            loop_current = (*loop_current).after;
+
+            temp =  *(temp.after);
             count++;
         }
 
-        // if unique (ind == 0) add to the list
-        if(indicator == 0){
+        if((*full_current).occurences < 2){
+            *uni_length = *uni_length + 1;
 
-            Word* newWord = createWord();
-            strcpy((*newWord).txt, buf);
+            /*
+            uni_current->after = full_current;
+            uni_last->after = uni_current;
+            uni_current->before = uni_last;
+            uni_current = full_current;*/
 
-            current = newWord;
-            last->after = current;
-            current->before = last;
-            last = current;
         }
+        
+        full_current =  (*full_current).after;
+        full_count++;
     }
-    fclose(f);
+
+
+    full_count = 0;
+    while (full_count < *full_length)
+    {   
+        
+        printf("%s", (*full_current).txt);
+        printf("%s", " occurred ");
+        printf("%d",  (*full_current).occurences);
+        printf("%s", " times.");
+        printf("%s", "\n");
+        
+        full_current =  (*full_current).after;
+        full_count++;
+        
+
+    }
+    
+
+
+    printf("%s", "\n");
+        
+    printf("%s", "Number of unique words: ");
+    printf("%d", uni_length);
+    printf("%s", "\n");
     return head;
 
 }
+
+
+
+
 
 // remove common words like "the", "a", "and", "or"
 void trim(Word* head, Word* rem_head, int* length, int* rem_length)
@@ -197,11 +208,10 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
 
     // iterates word list
     while(count<*length){
+
+
         int indicator = 0;
         inner_count = 0;
-        
-
-        
         
         int string_len = strlen( (*current).txt );
         int i = 1;
@@ -228,6 +238,7 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
         // iterates stop word list
         while(inner_count<*rem_length){
         
+            //checks if on removal list
             if(strcmp((*current).txt, (*rem_current).txt) == 0)
             {
                 *length = *length - 1;
@@ -237,6 +248,7 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
                 continue;
             }
 
+            // these two check for an empty word
             else if(strcmp((*current).txt, "") == 0)
             {
                 *length = *length - 1;
@@ -247,6 +259,14 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
             }
 
             else if((*current).txt[0] == '\0' )
+            {
+                *length = *length - 1;
+                current = deleteWord(current);
+                rem_current = (*rem_current).after;
+                indicator = 1;
+                continue;
+            }
+            else if(strlen((*current).txt) < 3 )
             {
                 *length = *length - 1;
                 current = deleteWord(current);
@@ -297,7 +317,6 @@ void word_analyze(Word* head, int* length)
         
         
         
-        
         current = (*current).after;
         count++;
         
@@ -343,10 +362,7 @@ int main(int argc, char* argv[]){
     char path1[50] = "test_text.txt";
     Word* head = parse(ptr, path1);
 
-    // setting length, and creating linked list of unique words
-    int unique_length = 0;
-    int* ptr2 = &length;
-    Word* unique_head = parse(ptr2, path1);
+    
 
     // setting length, and creating linked list of words to remove
     int rem_length = 0;
@@ -355,10 +371,19 @@ int main(int argc, char* argv[]){
     Word* rem_head = parse(ptr3, path2);
  
     
-    trim(head, rem_head, ptr, ptr2);
+    trim(head, rem_head, ptr, ptr3);
+
+    // setting length, and creating linked list of unique words
+    int unique_length = 0;
+    int* ptr2 = &unique_length;
+    Word* unique_head = unique_parse(ptr2, ptr, head);
+
+
+
+
     //print(head, ptr);
-    print(unique_head, ptr);
-    word_analyze(unique_head, ptr);
+    //print(unique_head, ptr2);
+    word_analyze(head, ptr);
 
     //phrase_analyze(&head, &length);
 }
