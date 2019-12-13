@@ -8,7 +8,7 @@ gcc text_analyzer.h
 # Execution Copy/Paste:
 ./analyzer.exe
 
-#Known Bugs:
+# Known Bugs:
 Occurrence tracking fails on first couple words
 
 trim isnt applying to min/max for some reason
