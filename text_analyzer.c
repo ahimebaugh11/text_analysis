@@ -41,7 +41,7 @@ void print(struct Word* head, int* length){
     struct Word word = *head;
     while(count<*length){
         printf("%s", word.txt);
-        printf("%s", "||||||||||||");
+        //printf("%s", "||||||||||||");
         printf("%s", "\n");
         count++;
         word = *(word.after);
@@ -112,53 +112,155 @@ Word* parse(int* length, char path[50])
     return head;
 }
 
+Word* unique_parse(int* length, char path[50])
+{
 
+    // initiates stuff for reading in text file
+    char buf[50];
+    FILE *f;
+    f=fopen(path,"r");
+
+
+    // initiates pointers
+    Word* head = NULL;
+    Word* last = NULL;
+    Word* current = NULL;
+    Word* loop_current = NULL;
+
+    while (1)
+    {
+        
+        
+        //if end of file, set pointer to head
+        if(feof(f)){
+            (*last).after = head;
+            (*head).before = last;
+            break;
+        }
+
+
+        *length = *length + 1;
+        
+        //next word
+        fscanf(f,"%s",buf);
+        
+
+        // IF first word, create new word and set as last word and head, iterate
+        if(last == NULL){
+            
+            head = createWord();
+            
+            strcpy((*head).txt, buf);
+            last = head;
+            current = head;
+
+        }
+        int indicator = 0;
+        int count = 0;
+        loop_current = head;
+
+        //checks if unique, if found to be equal to any of the current in the unique array, set ind to 1
+        while(count < *length){
+            indicator = strcmp(buf, (*loop_current).txt);
+            if(strcmp(buf, (*loop_current).txt)  == 1 ){
+                break;
+            }
+            loop_current = (*loop_current).after;
+            count++;
+        }
+
+        // if unique (ind == 0) add to the list
+        if(indicator == 0){
+
+            Word* newWord = createWord();
+            strcpy((*newWord).txt, buf);
+
+            current = newWord;
+            last->after = current;
+            current->before = last;
+            last = current;
+        }
+    }
+    fclose(f);
+    return head;
+
+}
+
+// remove common words like "the", "a", "and", "or"
 void trim(Word* head, Word* rem_head, int* length, int* rem_length)
 {
-    // remove common words like "the", "a", "and", "or"
+    
     int count = 0;
     int inner_count = 0;
     struct Word* current = head;
     struct Word* rem_current = rem_head;
 
-
-
-
-
+    // iterates word list
     while(count<*length){
         int indicator = 0;
         inner_count = 0;
-        // to lower case
-        /*for(int i = 0; (*current).txt[i]; i++){
-            (*current).txt[i] = tolower((*current).txt[i]);
-        }*/
+        
 
-    
-        for (int i = 0, len = strlen((*current).txt); i < len; i++) 
-        { 
-            if( isspace(((*current).txt)[i]) == 0 && ispunct(((*current).txt)[i]) == 0 ){
-                (*current).txt[i++] = tolower(((*current).txt)[i]);
-            }
+        
+        
+        int string_len = strlen( (*current).txt );
+        int i = 1;
+
+        //trim punctuation from right
+        while(ispunct(((*current).txt)[string_len-i]) != 0 ){
+            ((*current).txt)[string_len-i] = '\0';
+            i++;
+        }
+        
+        //trim punctuation from left
+        i = 0;
+        while(ispunct(((*current).txt)[i]) != 0 ){
+            ((*current).txt)[i] = '\0';
+            i++;
         }
 
-        while(inner_count<*rem_length){
-            
-            
+        // send everything to lower case
+        for(int i = 0; (*current).txt[i]; i++){
+            (*current).txt[i] = tolower((*current).txt[i]);
+        }
 
+
+        // iterates stop word list
+        while(inner_count<*rem_length){
+        
             if(strcmp((*current).txt, (*rem_current).txt) == 0)
-                {
-                //printf("%s", "TRIM: ");
-                //printf("%s", (*current).txt);
-                //printf("%s", "\n");
+            {
                 *length = *length - 1;
                 current = deleteWord(current);
                 rem_current = (*rem_current).after;
                 indicator = 1;
                 continue;
             }
+
+            else if(strcmp((*current).txt, "") == 0)
+            {
+                *length = *length - 1;
+                current = deleteWord(current);
+                rem_current = (*rem_current).after;
+                indicator = 1;
+                continue;
+            }
+
+            else if((*current).txt[0] == '\0' )
+            {
+                *length = *length - 1;
+                current = deleteWord(current);
+                rem_current = (*rem_current).after;
+                indicator = 1;
+                continue;
+            }
+            
+            
+            
             else{
                 rem_current = (*rem_current).after;
             }
+
             inner_count++;
         }
 
@@ -166,20 +268,13 @@ void trim(Word* head, Word* rem_head, int* length, int* rem_length)
             current = (*current).after;
             count++;
         }
-        
-        
-        
-        
     }
 
-    // Remove non-alphanumeric characters
 }
 
 void word_analyze(Word* head, int* length)
 {
-    // find shortest
-
-    // find longest
+    // instantiates variables for analysis
     int count = 0;
     struct Word* current = head;
     int len = 0;
@@ -187,6 +282,8 @@ void word_analyze(Word* head, int* length)
     char min_word[50];
     int max = 0;
     char max_word[50];
+
+    // iterates through list of words
     while(count<*length){
         len = strlen((*current).txt);
         if(len < min){
@@ -206,21 +303,27 @@ void word_analyze(Word* head, int* length)
         
         
     }
-    printf("%s", "Max: ");
+
+    // prints analysis to the user
+    printf("%s", "Max: \"");
     printf("%s", max_word);
-    printf("%s", " with a length of ");
+    printf("%s", "\" with a length of ");
     printf("%d", max);
     printf("%s", " letters");
     printf("%s", "\n");
-    printf("%s", "Min: ");
+    printf("%s", "Min: \"");
     printf("%s", min_word);
-    printf("%s", " with a length of ");
+    printf("%s", "\" with a length of ");
     printf("%d", min);
     printf("%s", " letters");
     printf("%s", "\n");
+    
 
 
-    // Count number of occurences of each unique word
+
+
+
+
 
 }
 
@@ -231,20 +334,31 @@ void phrase_analyze(Word *head, int *length)
 }
 
 int main(int argc, char* argv[]){
+
+
+
+    // setting length, and creating linked list of words
     int length = 0;
     int* ptr = &length;
     char path1[50] = "test_text.txt";
     Word* head = parse(ptr, path1);
 
+    // setting length, and creating linked list of unique words
+    int unique_length = 0;
+    int* ptr2 = &length;
+    Word* unique_head = parse(ptr2, path1);
+
+    // setting length, and creating linked list of words to remove
     int rem_length = 0;
-    int* ptr2 = &rem_length;
+    int* ptr3 = &rem_length;
     char path2[50] = "stop-word-list.txt";
-    Word* rem_head = parse(ptr2, path2);
+    Word* rem_head = parse(ptr3, path2);
  
-    trim(head, rem_head, ptr, ptr2);
-    print(head, ptr);
     
-    word_analyze(head, ptr);
+    trim(head, rem_head, ptr, ptr2);
+    //print(head, ptr);
+    print(unique_head, ptr);
+    word_analyze(unique_head, ptr);
 
     //phrase_analyze(&head, &length);
 }
