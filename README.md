@@ -12,3 +12,7 @@ gcc text_analyzer.h
 Occurrence tracking fails on first couple words
 
 trim isnt applying to min/max for some reason
+
+Does not trim unicode characters, primarily works only with ASCII values
+
+
