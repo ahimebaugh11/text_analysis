@@ -1,7 +1,7 @@
 # text_analysis
 Run from the command line
 # Compilation Copy/Paste:
-gcc text_analyzer.c -o analyzer.exe
+gcc text_analyzer.c -o analyzer.exe\n
 gcc text_analyzer.h
 
 # Execution Copy/Paste:
