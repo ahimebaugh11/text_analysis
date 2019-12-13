@@ -4,6 +4,14 @@ Run from the command line
 # Project Summary:
 This project takes input in the form of text files, I personally used Project Gutenberg texts such as Sherlock Holmes or other classics. This input is then processed, removing all the most common words, found in stop-word-list.txt, which can be added to or removed as needed. This process then finds the remaining words, how many times they appear in the text, and the number of unique words found in the text. As well, it finds the shortest and longest words in the text. It is compiled, runs, and outputs data all on the CLI.
 
+# Required Files:
+stop-word-list.txt
+
+test_text.txt
+
+text_analyzer.c
+
+text_analyzer.h
 
 # Compilation Copy/Paste:
 gcc text_analyzer.c -o analyzer.exe
